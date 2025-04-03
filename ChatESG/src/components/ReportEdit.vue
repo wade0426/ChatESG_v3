@@ -1094,7 +1094,23 @@ const handleGenerateText = async () => {
     // console.log(`大章節: ${chapterTitle}, 中章節: ${subChapterTitle}, 文字內容: ${content}, 呼叫生成文字`)
     const responseData = await reportEditStore.generateText(chapterTitle, subChapterTitle)
     console.log('生成文字結果:', responseData)
+    // 確保文本內容中的換行符被正確處理
     sectionContents.value[selectedSection.value] = responseData.text
+    
+    nextTick(() => {
+      const editableContentElement = document.querySelector('.editable-content')
+      if (editableContentElement && isSubChapter(selectedSection.value)) {
+        // 轉換存儲的內容為HTML格式，確保換行符被轉換為<p>或<br>標籤
+        const formattedContent = formatContentToHtml(sectionContents.value[selectedSection.value] || '')
+        editableContentElement.innerHTML = responseData.text
+        
+        // 檢查是否有換行問題
+        // console.log('原始文本:', responseData.text)
+        // console.log('格式化後HTML:', formattedContent)
+        // console.log('DOM內容:', editableContentElement.innerHTML)
+      }
+    })
+    
     reportEditStore.updateSubChapterText(selectedSection.value, responseData.text)
     // console.log('生成文字結果:', text)
   }
@@ -1173,12 +1189,15 @@ const getLoadingMessage = computed(() => {
 const formatContentWithParagraphs = (content) => {
   if (!content) return ''
   // 將文本內容按段落分隔並添加樣式
+  // return content
+  //   .split('\n')
+  //   .map(paragraph => paragraph.trim())
+  //   .filter(paragraph => paragraph.length > 0)
+  //   .map(paragraph => `<p class="content-paragraph">${paragraph}</p>`)
+  //   .join('')
+  
+  // 測試
   return content
-    .split('\n')
-    .map(paragraph => paragraph.trim())
-    .filter(paragraph => paragraph.length > 0)
-    .map(paragraph => `<p class="content-paragraph">${paragraph}</p>`)
-    .join('')
 }
 
 // 判斷是否顯示展開按鈕
